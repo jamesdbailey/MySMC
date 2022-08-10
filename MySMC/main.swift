@@ -20,23 +20,32 @@ enum FlagsType: String {
     }
 }
 
-func main() {
-    let smc = SMC()
-    let args = CommandLine.arguments.dropFirst()
-    
+func readSensors(smc: SMC, prefix: String) -> Dictionary<String, Double> {
+    var dict = [String: Double]()
     var keys = smc.getAllKeys()
-    args.forEach { (arg: String) in
-        let flag = FlagsType(value: arg)
-        if flag != .all {
-            keys = keys.filter{ $0.hasPrefix(flag.rawValue)}
-        }
+    keys = keys.filter{ $0.hasPrefix(prefix)}
+    keys.forEach {
+        (key: String) in
+        let value = smc.getValue(key)
+        dict[key] = value
     }
     
-    print("[INFO]: found \(keys.count) keys\n")
-    
-    keys.forEach { (key: String) in
-        let value = smc.getValue(key)
-        print("[\(key)]    ", value ?? 0)
+    return dict
+}
+
+func main() {
+    let smc = SMC()
+    let args = CommandLine.arguments
+    if (args.count > 1) {
+        let arg = args[1]
+        let sensors = readSensors(smc: smc, prefix: FlagsType(value: arg).rawValue)
+        
+        print("[INFO]: found \(sensors.count) keys\n")
+        
+        sensors.forEach {
+            (key: String, value: Double) in
+            print("[\(key)]    ", value)
+        }
     }
 }
 

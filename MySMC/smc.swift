@@ -277,7 +277,7 @@ public class SMC {
             input.data8 = SMCKeys.READ_INDEX.rawValue
             input.data32 = UInt32(i)
             
-            result = call(SMCKeys.KERNEL_INDEX.rawValue, input: &input, output: &output)
+            result = callFunction(SMCKeys.KERNEL_INDEX.rawValue, input: &input, output: &output)
             if result != kIOReturnSuccess {
                 continue
             }
@@ -299,7 +299,7 @@ public class SMC {
         input.key = FourCharCode(fromString: value.pointee.key)
         input.data8 = SMCKeys.READ_KEYINFO.rawValue
         
-        result = call(SMCKeys.KERNEL_INDEX.rawValue, input: &input, output: &output)
+        result = callFunction(SMCKeys.KERNEL_INDEX.rawValue, input: &input, output: &output)
         if result != kIOReturnSuccess {
             return result
         }
@@ -309,7 +309,7 @@ public class SMC {
         input.keyInfo.dataSize = output.keyInfo.dataSize
         input.data8 = SMCKeys.READ_BYTES.rawValue
         
-        result = call(SMCKeys.KERNEL_INDEX.rawValue, input: &input, output: &output)
+        result = callFunction(SMCKeys.KERNEL_INDEX.rawValue, input: &input, output: &output)
         if result != kIOReturnSuccess {
             return result
         }
@@ -319,7 +319,7 @@ public class SMC {
         return kIOReturnSuccess
     }
     
-    private func call(_ index: UInt8, input: inout SMCKeyData_t, output: inout SMCKeyData_t) -> kern_return_t {
+    private func callFunction(_ index: UInt8, input: inout SMCKeyData_t, output: inout SMCKeyData_t) -> kern_return_t {
         let inputSize = MemoryLayout<SMCKeyData_t>.stride
         var outputSize = MemoryLayout<SMCKeyData_t>.stride
         
