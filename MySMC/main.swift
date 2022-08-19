@@ -8,7 +8,7 @@ enum FlagsType: String {
     case temperature = "T"
     case voltage = "V"
     case power = "P"
-    case all
+    case all = ""
     
     init(value: String) {
         switch value {
@@ -23,7 +23,7 @@ enum FlagsType: String {
 func readSensors(smc: SMC, prefix: String) -> Dictionary<String, Double> {
     var dict = [String: Double]()
     var keys = smc.getAllKeys()
-    keys = keys.filter{ $0.hasPrefix(prefix)}
+    keys = keys.filter{prefix.isEmpty ? true : $0.hasPrefix(prefix)}
     keys.forEach {
         (key: String) in
         let value = smc.getValue(key)
@@ -36,16 +36,14 @@ func readSensors(smc: SMC, prefix: String) -> Dictionary<String, Double> {
 func main() {
     let smc = SMC()
     let args = CommandLine.arguments
-    if (args.count > 1) {
-        let arg = args[1]
-        let sensors = readSensors(smc: smc, prefix: FlagsType(value: arg).rawValue)
-        
-        print("[INFO]: found \(sensors.count) keys\n")
-        
-        sensors.forEach {
-            (key: String, value: Double) in
-            print("[\(key)]    ", value)
-        }
+    let arg = args.count > 1 ? args[1] : ""
+    let sensors = readSensors(smc: smc, prefix: FlagsType(value: arg).rawValue)
+    
+    print("[INFO]: found \(sensors.count) keys\n")
+    
+    sensors.forEach {
+        (key: String, value: Double) in
+        print("[\(key)]    ", value)
     }
 }
 
